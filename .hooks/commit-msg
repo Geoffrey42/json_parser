@@ -1,0 +1,3 @@
+#!/bin/sh
+
+mix format && mix credo && gommit check message "$(cat "$1")";
