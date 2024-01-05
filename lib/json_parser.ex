@@ -3,16 +3,25 @@ defmodule JsonParser do
   Documentation for `JsonParser`.
   """
 
-  @doc """
-  Hello world.
+  def main(args) when length(args) > 1 do
+    IO.puts(:stderr, "error: must have only one argument.")
+  end
 
-  ## Examples
+  def main(args) do
+    file_name = List.first(args)
 
-      iex> JsonParser.hello()
-      :world
+    case File.read(file_name) do
+      {:ok, text} ->
+        tokens = Lexer.lex(text)
 
-  """
-  def hello do
-    :world
+        case Parser.parse(tokens) do
+          {:ok, _ast} -> exit(:normal)
+          {:error, _reason} -> exit({:shutdown, 1})
+        end
+        
+ 
+      {:error, reason} -> IO.puts(:stderr, "error: could not read #{file_name} : #{:file.format_error(reason)}")
+        
+    end
   end
 end

@@ -7,7 +7,8 @@ defmodule JsonParser.MixProject do
       version: "0.1.0",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      escript: escript()
     ]
   end
 
@@ -23,5 +24,9 @@ defmodule JsonParser.MixProject do
     [
       {:credo, "~> 1.7.2"}
     ]
+  end
+
+  defp escript do
+    [main_module: JsonParser]
   end
 end
