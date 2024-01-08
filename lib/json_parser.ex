@@ -18,10 +18,9 @@ defmodule JsonParser do
           {:ok, _ast} -> exit(:normal)
           {:error, _reason} -> exit({:shutdown, 1})
         end
-        
- 
-      {:error, reason} -> IO.puts(:stderr, "error: could not read #{file_name} : #{:file.format_error(reason)}")
-        
+
+      {:error, reason} ->
+        IO.puts(:stderr, "error: could not read #{file_name} : #{:file.format_error(reason)}")
     end
   end
 end
