@@ -6,4 +6,16 @@ defmodule LexerTest do
 
     assert tokens == [:left_brace, :right_brace]
   end
+
+  test "should build tokens for simple object JSON" do
+    tokens = Lexer.lex("{\"key\": \"value\"}")
+
+    assert tokens == [
+             :left_brace,
+             {:string, "key"},
+             :colon,
+             {:string, "value"},
+             :right_brace
+           ]
+  end
 end
