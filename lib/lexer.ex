@@ -1,8 +1,13 @@
 defmodule Lexer do
   @moduledoc """
-  Build a list of tokens from the input text.
+  Build a list of tokens from the text input.
   """
 
+  @doc """
+  lex builds a list of tokens from a text input.
+  """
+
+  @spec lex(binary(), list(Entity.token())) :: list(Entity.token())
   def lex(text, tokens \\ [])
 
   def lex(<<>>, tokens), do: Enum.reverse(tokens)
