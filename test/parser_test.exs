@@ -9,15 +9,39 @@ defmodule ParserTest do
     assert {:error, :invalid_json} = Parser.parse([])
   end
 
-  test "should build AST for simple JSON object" do
+  test "should build AST for object containing various type values" do
     tokens = [
       :left_brace,
-      {:string, "key"},
+      {:string, "key1"},
+      :colon,
+      {:boolean, true},
+      :comma,
+      {:string, "key2"},
+      :colon,
+      {:boolean, false},
+      :comma,
+      {:string, "key3"},
+      :colon,
+      :null,
+      :comma,
+      {:string, "key4"},
       :colon,
       {:string, "value"},
+      :comma,
+      {:string, "key5"},
+      :colon,
+      {:number, 101},
       :right_brace
     ]
 
-    assert {:ok, {:object, [{"key", "value"}]}} = Parser.parse(tokens)
+    assert {:ok,
+            {:object,
+             [
+               {"key1", true},
+               {"key2", false},
+               {"key3", nil},
+               {"key4", "value"},
+               {"key5", 101}
+             ]}} = Parser.parse(tokens)
   end
 end

@@ -3,13 +3,6 @@ defmodule Parser do
   Parses the tokens to build an AST of 2-tuples nodes and leaves.
   """
 
-  # need to store state in an agent. Here
-  # state is the lookahead, the next token for my LL(2) parser
-  # parse will init the agent and start enumerate on the tokens
-  # a match private function will be used for terminal tokens
-  # a consume private function will be called by match to update the lookahead
-  # match will be called by non terminal functions that either call match or call another non terminal function. 
-
   @spec parse(list(Entity.token())) :: {:ok, Entity.ast()} | {:error, :atom}
   def parse([:left_brace, :right_brace]) do
     {:ok, {:object, []}}
@@ -37,14 +30,16 @@ defmodule Parser do
 
     value = get_value(List.first(next_tokens))
 
-    updated_ast = put_elem(ast, 1, [{key, value}])
+    updated_ast = update_object(ast, key, value)
 
-    case move_forward(next_tokens) |> hd do
+    next_tokens = move_forward(next_tokens)
+
+    case List.first(next_tokens) do
       :right_brace ->
-        updated_ast
+        sort_object_pairs(updated_ast)
 
       :comma ->
-        object(move_forward(tokens), updated_ast)
+        object(move_forward(next_tokens), updated_ast)
     end
   end
 
@@ -52,5 +47,25 @@ defmodule Parser do
 
   defp get_value({:string, value}), do: value
 
+  defp get_value({:boolean, value}), do: value
+
+  defp get_value({:number, value}), do: value
+
+  defp get_value(:null), do: nil
+
   defp move_forward(tokens), do: Enum.drop(tokens, 1)
+
+  defp update_object(ast, key, value) do
+    existing_pairs = elem(ast, 1)
+
+    {:object, [{key, value} | existing_pairs]}
+  end
+
+  defp sort_object_pairs(ast) do
+    sorted_pairs =
+      elem(ast, 1)
+      |> Enum.reverse()
+
+    {:object, sorted_pairs}
+  end
 end
