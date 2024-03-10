@@ -12,43 +12,50 @@ defmodule Lexer do
 
   def lex(<<>>, tokens), do: Enum.reverse(tokens)
 
-  def lex(<<char, rest::binary>>, tokens) do
-    case char do
-      ?{ ->
-        lex(rest, [:left_brace | tokens])
+  def lex(<<?{, rest::binary>>, tokens) do
+    lex(rest, [:left_brace | tokens])
+  end
 
-      ?} ->
-        lex(rest, [:right_brace | tokens])
+  def lex(<<?}, rest::binary>>, tokens) do
+    lex(rest, [:right_brace | tokens])
+  end
 
-      ?: ->
-        lex(rest, [:colon | tokens])
+  def lex(<<?:, rest::binary>>, tokens) do
+    lex(rest, [:colon | tokens])
+  end
 
-      ?, ->
-        lex(rest, [:comma | tokens])
+  def lex(<<?,, rest::binary>>, tokens) do
+    lex(rest, [:comma | tokens])
+  end
 
-      ?t ->
-        scan_boolean(rest, true, tokens)
+  def lex(<<?t, rest::binary>>, tokens) do
+    scan_boolean(rest, true, tokens)
+  end
 
-      ?f ->
-        scan_boolean(rest, false, tokens)
+  def lex(<<?f, rest::binary>>, tokens) do
+    scan_boolean(rest, false, tokens)
+  end
 
-      ?n ->
-        scan_null(rest, tokens)
+  def lex(<<?n, rest::binary>>, tokens) do
+    scan_null(rest, tokens)
+  end
 
-      ?" ->
-        {string_content, new_rest} = scan_string(rest)
-        lex(new_rest, [{:string, string_content} | tokens])
+  def lex(<<?", rest::binary>>, tokens) do
+    {string_content, new_rest} = scan_string(rest)
+    lex(new_rest, [{:string, string_content} | tokens])
+  end
 
-      ?\s ->
-        lex(rest, tokens)
+  def lex(<<?\s, rest::binary>>, tokens) do
+    lex(rest, tokens)
+  end
 
-      ?\n ->
-        lex(rest, tokens)
+  def lex(<<?\n, rest::binary>>, tokens) do
+    lex(rest, tokens)
+  end
 
-      nb when is_number(nb) ->
-        {number_content, new_rest} = scan_number(nb, rest)
-        lex(new_rest, [{:number, number_content} | tokens])
-    end
+  def lex(<<nb, rest::binary>>, tokens) when is_number(nb) do
+    {number_content, new_rest} = scan_number(nb, rest)
+    lex(new_rest, [{:number, number_content} | tokens])
   end
 
   defp scan_boolean(text, mode, tokens) do
