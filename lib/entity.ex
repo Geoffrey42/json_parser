@@ -6,7 +6,14 @@ defmodule Entity do
   @typedoc """
   A lexical token is a term with an assigned and thus identified meaning.
   """
-  @type token :: :left_brace | :right_brace | :colon | {:string, binary()}
+  @type token ::
+          :left_brace
+          | :right_brace
+          | :colon
+          | :comma
+          | {:string, binary()}
+          | {:boolean, boolean()}
+          | {:number, integer()}
 
   @typedoc """
   Abstract Syntax Tree (AST) representing the structure of the given JSON.
