@@ -15,9 +15,42 @@ defmodule Parser do
     {:ok, {:object, []}}
   end
 
-  def parse([:left_brace, {:string, key}, :colon, {:string, value}, :right_brace]) do
-    {:ok, {:object, [{key, value}]}}
+  def parse([]), do: {:error, :invalid_json}
+
+  def parse(tokens) do
+    ast =
+      case List.first(tokens) do
+        :left_brace ->
+          object(Enum.drop(tokens, 1), {:object, []})
+      end
+
+    {:ok, ast}
   end
 
-  def parse([]), do: {:error, :invalid_json}
+  defp object(tokens, ast) do
+    key = get_key(List.first(tokens))
+
+    next_tokens =
+      tokens
+      |> move_forward()
+      |> move_forward()
+
+    value = get_value(List.first(next_tokens))
+
+    updated_ast = put_elem(ast, 1, [{key, value}])
+
+    case move_forward(next_tokens) |> hd do
+      :right_brace ->
+        updated_ast
+
+      :comma ->
+        object(move_forward(tokens), updated_ast)
+    end
+  end
+
+  defp get_key({:string, key}), do: key
+
+  defp get_value({:string, value}), do: value
+
+  defp move_forward(tokens), do: Enum.drop(tokens, 1)
 end
