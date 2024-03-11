@@ -13,7 +13,9 @@ defmodule LexerTest do
       \"key2\": false,
       \"key3\": null,
       \"key4\": \"value\",
-      \"key5\": 101
+      \"key5\": 101,
+      \"key-o\": {\"subkey\": \"subvalue\"},
+      \"key-l\": [\"1\", 2]
     }")
 
     assert tokens == [
@@ -37,6 +39,22 @@ defmodule LexerTest do
              {:string, "key5"},
              :colon,
              {:number, 101},
+             :comma,
+             {:string, "key-o"},
+             :colon,
+             :left_brace,
+             {:string, "subkey"},
+             :colon,
+             {:string, "subvalue"},
+             :right_brace,
+             :comma,
+             {:string, "key-l"},
+             :colon,
+             :left_bracket,
+             {:string, "1"},
+             :comma,
+             {:number, 2},
+             :right_bracket,
              :right_brace
            ]
   end

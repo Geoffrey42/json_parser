@@ -20,6 +20,14 @@ defmodule Lexer do
     lex(rest, [:right_brace | tokens])
   end
 
+  def lex(<<?[, rest::binary>>, tokens) do
+    lex(rest, [:left_bracket | tokens])
+  end
+
+  def lex(<<?], rest::binary>>, tokens) do
+    lex(rest, [:right_bracket | tokens])
+  end
+
   def lex(<<?:, rest::binary>>, tokens) do
     lex(rest, [:colon | tokens])
   end
