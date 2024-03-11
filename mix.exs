@@ -22,7 +22,8 @@ defmodule JsonParser.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:credo, "~> 1.7.2"}
+      {:credo, "~> 1.7.2"},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 

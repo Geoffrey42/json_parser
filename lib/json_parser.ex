@@ -16,7 +16,6 @@ defmodule JsonParser do
 
         case Parser.parse(tokens) do
           {:ok, _ast} -> exit(:normal)
-          {:error, _reason} -> exit({:shutdown, 1})
         end
 
       {:error, reason} ->
