@@ -7,33 +7,34 @@ defmodule Lexer do
   lex builds a list of tokens from a text input.
   """
 
-  @spec lex(binary(), list(Entity.token())) :: list(Entity.token())
+  @spec lex(binary()) :: list(Entity.token()) | nil
+  @spec lex(binary(), list(Entity.token())) :: list(Entity.token()) | nil
   def lex(text, tokens \\ [])
 
   def lex(<<>>, tokens), do: Enum.reverse(tokens)
 
   def lex(<<?{, rest::binary>>, tokens) do
-    lex(rest, [:left_brace | tokens])
+    lex(rest, [{:delimiter, :left_brace} | tokens])
   end
 
   def lex(<<?}, rest::binary>>, tokens) do
-    lex(rest, [:right_brace | tokens])
+    lex(rest, [{:delimiter, :right_brace} | tokens])
   end
 
   def lex(<<?[, rest::binary>>, tokens) do
-    lex(rest, [:left_bracket | tokens])
+    lex(rest, [{:delimiter, :left_bracket} | tokens])
   end
 
   def lex(<<?], rest::binary>>, tokens) do
-    lex(rest, [:right_bracket | tokens])
+    lex(rest, [{:delimiter, :right_bracket} | tokens])
   end
 
   def lex(<<?:, rest::binary>>, tokens) do
-    lex(rest, [:colon | tokens])
+    lex(rest, [{:delimiter, :colon} | tokens])
   end
 
   def lex(<<?,, rest::binary>>, tokens) do
-    lex(rest, [:comma | tokens])
+    lex(rest, [{:delimiter, :comma} | tokens])
   end
 
   def lex(<<?t, rest::binary>>, tokens) do

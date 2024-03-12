@@ -7,13 +7,16 @@ defmodule Entity do
   A lexical token is a term with an assigned and thus identified meaning.
   """
   @type token ::
-          :left_brace
-          | :right_brace
-          | :colon
-          | :comma
+          {:delimiter, :left_brace}
+          | {:delimiter, :right_brace}
+          | {:delimiter, :colon}
+          | {:delimiter, :comma}
+          | {:delimiter, :left_bracket}
+          | {:delimiter, :right_bracket}
           | {:string, binary()}
           | {:boolean, boolean()}
           | {:number, integer()}
+          | :null
 
   @typedoc """
   Abstract Syntax Tree (AST) representing the structure of the given JSON.

@@ -4,7 +4,7 @@ defmodule LexerTest do
   test "should build tokens for empty JSON object {}" do
     tokens = Lexer.lex("{}")
 
-    assert tokens == [:left_brace, :right_brace]
+    assert tokens == [{:delimiter, :left_brace}, {:delimiter, :right_brace}]
   end
 
   test "should build tokens for object containing various type values" do
@@ -19,43 +19,43 @@ defmodule LexerTest do
     }")
 
     assert tokens == [
-             :left_brace,
+             {:delimiter, :left_brace},
              {:string, "key1"},
-             :colon,
+             {:delimiter, :colon},
              {:boolean, true},
-             :comma,
+             {:delimiter, :comma},
              {:string, "key2"},
-             :colon,
+             {:delimiter, :colon},
              {:boolean, false},
-             :comma,
+             {:delimiter, :comma},
              {:string, "key3"},
-             :colon,
+             {:delimiter, :colon},
              :null,
-             :comma,
+             {:delimiter, :comma},
              {:string, "key4"},
-             :colon,
+             {:delimiter, :colon},
              {:string, "value"},
-             :comma,
+             {:delimiter, :comma},
              {:string, "key5"},
-             :colon,
+             {:delimiter, :colon},
              {:number, 101},
-             :comma,
+             {:delimiter, :comma},
              {:string, "key-o"},
-             :colon,
-             :left_brace,
+             {:delimiter, :colon},
+             {:delimiter, :left_brace},
              {:string, "subkey"},
-             :colon,
+             {:delimiter, :colon},
              {:string, "subvalue"},
-             :right_brace,
-             :comma,
+             {:delimiter, :right_brace},
+             {:delimiter, :comma},
              {:string, "key-l"},
-             :colon,
-             :left_bracket,
+             {:delimiter, :colon},
+             {:delimiter, :left_bracket},
              {:string, "1"},
-             :comma,
+             {:delimiter, :comma},
              {:number, 2},
-             :right_bracket,
-             :right_brace
+             {:delimiter, :right_bracket},
+             {:delimiter, :right_brace}
            ]
   end
 end
