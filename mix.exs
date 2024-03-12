@@ -8,7 +8,8 @@ defmodule JsonParser.MixProject do
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      escript: escript()
+      escript: escript(),
+      dialyzer: [flags: [:unmatched_returns, :error_handling, :underspecs]]
     ]
   end
 

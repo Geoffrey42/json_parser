@@ -8,7 +8,7 @@ defmodule Lexer do
   """
 
   @spec lex(binary()) :: list(Entity.token()) | nil
-  @spec lex(binary(), list(Entity.token())) :: list(Entity.token()) | nil
+  @spec lex(binary() | <<>>, list(Entity.token())) :: list(Entity.token()) | nil
   def lex(text, tokens \\ [])
 
   def lex(<<>>, tokens), do: Enum.reverse(tokens)
