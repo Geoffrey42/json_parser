@@ -29,11 +29,24 @@ defmodule Parser do
     updated_ast = put_in(ast, [:object, key], value)
 
     case List.first(next_tokens_again) do
-      {:delimiter, :right_brace} ->
-        {updated_ast, next_tokens_again}
+      {:delimiter, :right_brace} -> {updated_ast, next_tokens_again}
+      {:delimiter, :comma} -> object(move_forward(next_tokens_again), updated_ast)
+      nil -> {updated_ast, []}
+    end
+  end
 
-      {:delimiter, :comma} ->
-        object(move_forward(next_tokens_again), updated_ast)
+  @spec array(list(Entity.token()), map()) :: {map(), list(Entity.token())}
+  defp array([], ast), do: {sort(ast), []}
+
+  defp array(tokens, ast) do
+    {value, next_tokens} = pop_tokens(tokens, 1)
+
+    updated_ast = put_in(ast, [:array], [value | ast.array])
+
+    case List.first(next_tokens) do
+      {:delimiter, :right_bracket} -> {updated_ast, next_tokens}
+      {:delimiter, :comma} -> array(move_forward(next_tokens), updated_ast)
+      {:delimiter, :right_brace} -> array(skip_delimiters(next_tokens), updated_ast)
     end
   end
 
@@ -41,11 +54,34 @@ defmodule Parser do
     object(remaining_tokens, %{object: %{}})
   end
 
+  defp pop_tokens([{:delimiter, :left_bracket} | remaining_tokens], _times) do
+    array(remaining_tokens, %{array: []})
+  end
+
   defp pop_tokens([:null | remaining_tokens], _times), do: {nil, remaining_tokens}
 
-  defp pop_tokens([{type, value} | _remaining_tokens] = tokens, times) when is_atom(type) do
+  @value_tokens [:number, :string, :boolean]
+  defp pop_tokens([{type, value} | _remaining_tokens] = tokens, times)
+       when is_atom(type) and type in @value_tokens do
     {value, move_forward(tokens, times)}
   end
 
   defp move_forward(tokens, nb \\ 1), do: Enum.drop(tokens, nb)
+
+  defp skip_delimiters([]), do: []
+
+  @delimiter_tokens [:right_brace, :right_bracket]
+  defp skip_delimiters([{:delimiter, value} | remaining_tokens])
+       when value in @delimiter_tokens do
+    skip_delimiters(remaining_tokens)
+  end
+
+  defp skip_delimiters([{type, _value} | _remaining_tokens] = tokens)
+       when type in @value_tokens do
+    tokens
+  end
+
+  defp sort(%{array: elements} = ast) do
+    %{ast | array: Enum.reverse(elements)}
+  end
 end

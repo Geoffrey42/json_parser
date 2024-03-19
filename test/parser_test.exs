@@ -35,11 +35,17 @@ defmodule ParserTest do
       {:delimiter, :comma},
       {:string, "key6"},
       {:delimiter, :colon},
+      {:delimiter, :left_bracket},
+      {:number, 42},
+      {:delimiter, :comma},
+      {:string, "forty-two"},
+      {:delimiter, :comma},
       {:delimiter, :left_brace},
       {:string, "subkey1"},
       {:delimiter, :colon},
       {:boolean, true},
       {:delimiter, :right_brace},
+      {:delimiter, :right_bracket},
       {:delimiter, :right_brace}
     ]
 
@@ -51,7 +57,7 @@ defmodule ParserTest do
                 "key3" => nil,
                 "key4" => "value",
                 "key5" => 101,
-                "key6" => %{object: %{"subkey1" => true}}
+                "key6" => %{array: [42, "forty-two", %{object: %{"subkey1" => true}}]}
               }
             }} = Parser.parse(tokens)
   end
