@@ -2,7 +2,8 @@ defmodule ParserTest do
   use ExUnit.Case, async: true
 
   test "should build AST for empty JSON object {}" do
-    assert {:ok, {:object, []}} = Parser.parse([:left_brace, :right_brace])
+    assert {:ok, {:object, []}} =
+             Parser.parse([{:delimiter, :left_brace}, {:delimiter, :right_brace}])
   end
 
   test "should return an error for an invalid JSON (empty text)" do
@@ -11,27 +12,27 @@ defmodule ParserTest do
 
   test "should build AST for object containing various type values" do
     tokens = [
-      :left_brace,
+      {:delimiter, :left_brace},
       {:string, "key1"},
-      :colon,
+      {:delimiter, :colon},
       {:boolean, true},
-      :comma,
+      {:delimiter, :comma},
       {:string, "key2"},
-      :colon,
+      {:delimiter, :colon},
       {:boolean, false},
-      :comma,
+      {:delimiter, :comma},
       {:string, "key3"},
-      :colon,
+      {:delimiter, :colon},
       :null,
-      :comma,
+      {:delimiter, :comma},
       {:string, "key4"},
-      :colon,
+      {:delimiter, :colon},
       {:string, "value"},
-      :comma,
+      {:delimiter, :comma},
       {:string, "key5"},
-      :colon,
+      {:delimiter, :colon},
       {:number, 101},
-      :right_brace
+      {:delimiter, :right_brace}
     ]
 
     assert {:ok,

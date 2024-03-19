@@ -4,7 +4,7 @@ defmodule Parser do
   """
 
   @spec parse(list(Entity.token())) :: {:ok, Entity.ast()}
-  def parse([:left_brace, :right_brace]) do
+  def parse([{:delimiter, :left_brace}, {:delimiter, :right_brace}]) do
     {:ok, {:object, []}}
   end
 
@@ -13,7 +13,7 @@ defmodule Parser do
   def parse(tokens) do
     ast =
       case List.first(tokens) do
-        :left_brace ->
+        {:delimiter, :left_brace} ->
           object(Enum.drop(tokens, 1), {:object, []})
       end
 
@@ -35,10 +35,10 @@ defmodule Parser do
     next_tokens = move_forward(next_tokens)
 
     case List.first(next_tokens) do
-      :right_brace ->
+      {:delimiter, :right_brace} ->
         sort_object_pairs(updated_ast)
 
-      :comma ->
+      {:delimiter, :comma} ->
         object(move_forward(next_tokens), updated_ast)
     end
   end
