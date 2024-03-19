@@ -22,9 +22,9 @@ defmodule Parser do
   end
 
   defp object(tokens, ast) do
-    {key, next_tokens} = pop_key(tokens)
+    {key, next_tokens} = pop_tokens(tokens, 2)
 
-    {value, next_tokens_again} = pop_value(next_tokens)
+    {value, next_tokens_again} = pop_tokens(next_tokens, 1)
 
     updated_ast = put_in(ast, [:object, key], value)
 
@@ -37,22 +37,15 @@ defmodule Parser do
     end
   end
 
-  defp pop_key([{:string, key} | remaining_tokens]), do: {key, move_forward(remaining_tokens)}
-
-  defp pop_value([{:string, value} | remaining_tokens]),
-    do: {value, remaining_tokens}
-
-  defp pop_value([{:boolean, value} | remaining_tokens]),
-    do: {value, remaining_tokens}
-
-  defp pop_value([{:number, value} | remaining_tokens]),
-    do: {value, remaining_tokens}
-
-  defp pop_value([:null | remaining_tokens]), do: {nil, remaining_tokens}
-
-  defp pop_value([{:delimiter, :left_brace} | remaining_tokens]) do
+  defp pop_tokens([{:delimiter, :left_brace} | remaining_tokens], _times) do
     object(remaining_tokens, %{object: %{}})
   end
 
-  defp move_forward(tokens), do: Enum.drop(tokens, 1)
+  defp pop_tokens([:null | remaining_tokens], _times), do: {nil, remaining_tokens}
+
+  defp pop_tokens([{type, value} | _remaining_tokens] = tokens, times) when is_atom(type) do
+    {value, move_forward(tokens, times)}
+  end
+
+  defp move_forward(tokens, nb \\ 1), do: Enum.drop(tokens, nb)
 end
