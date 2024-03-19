@@ -36,13 +36,14 @@ defmodule ParserTest do
     ]
 
     assert {:ok,
-            {:object,
-             [
-               {"key1", true},
-               {"key2", false},
-               {"key3", nil},
-               {"key4", "value"},
-               {"key5", 101}
-             ]}} = Parser.parse(tokens)
+            %{
+              object: %{
+                "key1" => true,
+                "key2" => false,
+                "key3" => nil,
+                "key4" => "value",
+                "key5" => 101
+              }
+            }} = Parser.parse(tokens)
   end
 end

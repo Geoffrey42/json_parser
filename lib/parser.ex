@@ -14,7 +14,7 @@ defmodule Parser do
     ast =
       case List.first(tokens) do
         {:delimiter, :left_brace} ->
-          object(Enum.drop(tokens, 1), {:object, []})
+          object(Enum.drop(tokens, 1), %{object: %{}})
       end
 
     {:ok, ast}
@@ -30,13 +30,13 @@ defmodule Parser do
 
     value = get_value(List.first(next_tokens))
 
-    updated_ast = update_object(ast, key, value)
+    updated_ast = put_in(ast, [:object, key], value)
 
     next_tokens = move_forward(next_tokens)
 
     case List.first(next_tokens) do
       {:delimiter, :right_brace} ->
-        sort_object_pairs(updated_ast)
+        updated_ast
 
       {:delimiter, :comma} ->
         object(move_forward(next_tokens), updated_ast)
@@ -54,18 +54,4 @@ defmodule Parser do
   defp get_value(:null), do: nil
 
   defp move_forward(tokens), do: Enum.drop(tokens, 1)
-
-  defp update_object(ast, key, value) do
-    existing_pairs = elem(ast, 1)
-
-    {:object, [{key, value} | existing_pairs]}
-  end
-
-  defp sort_object_pairs(ast) do
-    sorted_pairs =
-      elem(ast, 1)
-      |> Enum.reverse()
-
-    {:object, sorted_pairs}
-  end
 end
