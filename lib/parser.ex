@@ -14,44 +14,45 @@ defmodule Parser do
     ast =
       case List.first(tokens) do
         {:delimiter, :left_brace} ->
-          object(Enum.drop(tokens, 1), %{object: %{}})
+          {ast, _last_tokens} = object(Enum.drop(tokens, 1), %{object: %{}})
+          ast
       end
 
     {:ok, ast}
   end
 
   defp object(tokens, ast) do
-    key = get_key(List.first(tokens))
+    {key, next_tokens} = pop_key(tokens)
 
-    next_tokens =
-      tokens
-      |> move_forward()
-      |> move_forward()
-
-    value = get_value(List.first(next_tokens))
+    {value, next_tokens_again} = pop_value(next_tokens)
 
     updated_ast = put_in(ast, [:object, key], value)
 
-    next_tokens = move_forward(next_tokens)
-
-    case List.first(next_tokens) do
+    case List.first(next_tokens_again) do
       {:delimiter, :right_brace} ->
-        updated_ast
+        {updated_ast, next_tokens_again}
 
       {:delimiter, :comma} ->
-        object(move_forward(next_tokens), updated_ast)
+        object(move_forward(next_tokens_again), updated_ast)
     end
   end
 
-  defp get_key({:string, key}), do: key
+  defp pop_key([{:string, key} | remaining_tokens]), do: {key, move_forward(remaining_tokens)}
 
-  defp get_value({:string, value}), do: value
+  defp pop_value([{:string, value} | remaining_tokens]),
+    do: {value, remaining_tokens}
 
-  defp get_value({:boolean, value}), do: value
+  defp pop_value([{:boolean, value} | remaining_tokens]),
+    do: {value, remaining_tokens}
 
-  defp get_value({:number, value}), do: value
+  defp pop_value([{:number, value} | remaining_tokens]),
+    do: {value, remaining_tokens}
 
-  defp get_value(:null), do: nil
+  defp pop_value([:null | remaining_tokens]), do: {nil, remaining_tokens}
+
+  defp pop_value([{:delimiter, :left_brace} | remaining_tokens]) do
+    object(remaining_tokens, %{object: %{}})
+  end
 
   defp move_forward(tokens), do: Enum.drop(tokens, 1)
 end
