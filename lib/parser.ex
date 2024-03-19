@@ -3,7 +3,7 @@ defmodule Parser do
   Parses the tokens to build an AST of 2-tuples nodes and leaves.
   """
 
-  @spec parse(list(Entity.token())) :: {:ok, Entity.ast()}
+  @spec parse(list(Entity.token())) :: {:ok, map()}
   def parse([{:delimiter, :left_brace}, {:delimiter, :right_brace}]) do
     {:ok, {:object, []}}
   end

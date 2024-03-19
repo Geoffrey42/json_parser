@@ -17,9 +17,4 @@ defmodule Entity do
           | {:boolean, boolean()}
           | {:number, integer()}
           | :null
-
-  @typedoc """
-  Abstract Syntax Tree (AST) representing the structure of the given JSON.
-  """
-  @type ast :: {:object, list()}
 end
