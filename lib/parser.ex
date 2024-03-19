@@ -5,7 +5,7 @@ defmodule Parser do
 
   @spec parse(list(Entity.token())) :: {:ok, map()}
   def parse([{:delimiter, :left_brace}, {:delimiter, :right_brace}]) do
-    {:ok, {:object, []}}
+    {:ok, {:object, %{}}}
   end
 
   def parse([]), do: {:error, :invalid_json}

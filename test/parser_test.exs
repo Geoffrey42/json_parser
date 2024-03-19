@@ -2,7 +2,7 @@ defmodule ParserTest do
   use ExUnit.Case, async: true
 
   test "should build AST for empty JSON object {}" do
-    assert {:ok, {:object, []}} =
+    assert {:ok, {:object, %{}}} =
              Parser.parse([{:delimiter, :left_brace}, {:delimiter, :right_brace}])
   end
 
