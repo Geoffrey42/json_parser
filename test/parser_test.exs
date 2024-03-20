@@ -68,6 +68,27 @@ defmodule ParserTest do
             }} = Parser.parse(tokens)
   end
 
+  test "should build AST for JSON object containing simple array" do
+    tokens = [
+      {:delimiter, :left_brace},
+      {:string, "key1"},
+      {:delimiter, :colon},
+      {:delimiter, :left_bracket},
+      {:number, 42},
+      {:delimiter, :comma},
+      {:string, "forty-two"},
+      {:delimiter, :right_bracket},
+      {:delimiter, :right_brace}
+    ]
+
+    assert {:ok,
+            %{
+              object: %{
+                "key1" => %{array: [42, "forty-two"]}
+              }
+            }} = Parser.parse(tokens)
+  end
+
   test "should build AST for JSON object containing complex array (with object inside)" do
     tokens = [
       {:delimiter, :left_brace},

@@ -22,6 +22,8 @@ defmodule Parser do
   end
 
   @spec object(list(Entity.token()), map()) :: {map(), list(Entity.token())}
+  defp object([], ast), do: {ast, []}
+
   defp object(tokens, ast) do
     {key, next_tokens} = pop_tokens(tokens, 2)
 
@@ -32,6 +34,7 @@ defmodule Parser do
     case List.first(next_tokens_again) do
       {:delimiter, :right_brace} -> {updated_ast, next_tokens_again}
       {:delimiter, :comma} -> object(move_forward(next_tokens_again), updated_ast)
+      {:delimiter, :right_bracket} -> object(skip_delimiters(next_tokens_again), updated_ast)
       nil -> {updated_ast, []}
     end
   end
@@ -45,7 +48,7 @@ defmodule Parser do
     updated_ast = put_in(ast, [:array], [value | ast.array])
 
     case List.first(next_tokens) do
-      {:delimiter, :right_bracket} -> {updated_ast, next_tokens}
+      {:delimiter, :right_bracket} -> {sort(updated_ast), next_tokens}
       {:delimiter, :comma} -> array(move_forward(next_tokens), updated_ast)
       {:delimiter, :right_brace} -> array(skip_delimiters(next_tokens), updated_ast)
     end
