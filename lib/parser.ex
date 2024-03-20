@@ -21,6 +21,7 @@ defmodule Parser do
     {:ok, ast}
   end
 
+  @spec object(list(Entity.token()), map()) :: {map(), list(Entity.token())}
   defp object(tokens, ast) do
     {key, next_tokens} = pop_tokens(tokens, 2)
 
