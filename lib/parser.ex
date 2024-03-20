@@ -54,8 +54,22 @@ defmodule Parser do
     end
   end
 
+  defp pop_tokens(
+         [{:delimiter, :left_brace} | [{:delimiter, :right_brace} | remaining_tokens]],
+         _times
+       ) do
+    {%{object: %{}}, remaining_tokens}
+  end
+
   defp pop_tokens([{:delimiter, :left_brace} | remaining_tokens], _times) do
     object(remaining_tokens, %{object: %{}})
+  end
+
+  defp pop_tokens(
+         [{:delimiter, :left_bracket} | [{:delimiter, :right_bracket} | remaining_tokens]],
+         _times
+       ) do
+    {%{array: []}, remaining_tokens}
   end
 
   defp pop_tokens([{:delimiter, :left_bracket} | remaining_tokens], _times) do

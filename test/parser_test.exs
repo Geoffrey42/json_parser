@@ -32,6 +32,16 @@ defmodule ParserTest do
       {:string, "key5"},
       {:delimiter, :colon},
       {:number, 101},
+      {:delimiter, :comma},
+      {:string, "key-o"},
+      {:delimiter, :colon},
+      {:delimiter, :left_brace},
+      {:delimiter, :right_brace},
+      {:delimiter, :comma},
+      {:string, "key-l"},
+      {:delimiter, :colon},
+      {:delimiter, :left_bracket},
+      {:delimiter, :right_bracket},
       {:delimiter, :right_brace}
     ]
 
@@ -42,7 +52,9 @@ defmodule ParserTest do
                 "key2" => false,
                 "key3" => nil,
                 "key4" => "value",
-                "key5" => 101
+                "key5" => 101,
+                "key-o" => %{object: %{}},
+                "key-l" => %{array: []}
               }
             }} = Parser.parse(tokens)
   end
