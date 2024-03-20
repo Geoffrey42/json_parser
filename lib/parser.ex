@@ -1,6 +1,6 @@
 defmodule Parser do
   @moduledoc """
-  Parses the tokens to build an AST of 2-tuples nodes and leaves.
+  Parses the tokens to build an AST.
   """
 
   @spec parse(list(Entity.token())) :: {:ok, map()}
