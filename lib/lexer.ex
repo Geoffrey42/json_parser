@@ -7,94 +7,63 @@ defmodule Lexer do
   lex builds a list of tokens from a text input.
   """
 
-  @spec lex(binary()) :: list(Entity.token()) | nil
-  @spec lex(binary() | <<>>, list(Entity.token())) :: list(Entity.token()) | nil
+  @spec lex(binary()) :: list(Entity.token())
   def lex(text, tokens \\ [])
 
-  def lex(<<>>, tokens), do: Enum.reverse(tokens)
+  def lex("", tokens), do: Enum.reverse(tokens)
 
-  def lex(<<?{, rest::binary>>, tokens) do
+  def lex("{" <> rest, tokens) do
     lex(rest, [{:delimiter, :left_brace} | tokens])
   end
 
-  def lex(<<?}, rest::binary>>, tokens) do
+  def lex("}" <> rest, tokens) do
     lex(rest, [{:delimiter, :right_brace} | tokens])
   end
 
-  def lex(<<?[, rest::binary>>, tokens) do
+  def lex("[" <> rest, tokens) do
     lex(rest, [{:delimiter, :left_bracket} | tokens])
   end
 
-  def lex(<<?], rest::binary>>, tokens) do
+  def lex("]" <> rest, tokens) do
     lex(rest, [{:delimiter, :right_bracket} | tokens])
   end
 
-  def lex(<<?:, rest::binary>>, tokens) do
+  def lex(":" <> rest, tokens) do
     lex(rest, [{:delimiter, :colon} | tokens])
   end
 
-  def lex(<<?,, rest::binary>>, tokens) do
+  def lex("," <> rest, tokens) do
     lex(rest, [{:delimiter, :comma} | tokens])
   end
 
-  def lex(<<?t, rest::binary>>, tokens) do
-    scan_boolean(rest, true, tokens)
+  def lex("true" <> rest, tokens) do
+    lex(rest, [{:boolean, true} | tokens])
   end
 
-  def lex(<<?f, rest::binary>>, tokens) do
-    scan_boolean(rest, false, tokens)
+  def lex("false" <> rest, tokens) do
+    lex(rest, [{:boolean, false} | tokens])
   end
 
-  def lex(<<?n, rest::binary>>, tokens) do
-    scan_null(rest, tokens)
+  def lex("null" <> rest, tokens) do
+    lex(rest, [:null | tokens])
   end
 
-  def lex(<<?", rest::binary>>, tokens) do
+  def lex("\"" <> rest, tokens) do
     {string_content, new_rest} = scan_string(rest)
     lex(new_rest, [{:string, string_content} | tokens])
   end
 
-  def lex(<<?\s, rest::binary>>, tokens) do
+  def lex(" " <> rest, tokens) do
     lex(rest, tokens)
   end
 
-  def lex(<<?\n, rest::binary>>, tokens) do
+  def lex("\n" <> rest, tokens) do
     lex(rest, tokens)
   end
 
   def lex(<<nb, rest::binary>>, tokens) when is_number(nb) do
     {number_content, new_rest} = scan_number(nb, rest)
     lex(new_rest, [{:number, number_content} | tokens])
-  end
-
-  defp scan_boolean(text, mode, tokens) do
-    remaining_char =
-      case mode do
-        true -> "rue"
-        false -> "alse"
-      end
-
-    if String.starts_with?(text, remaining_char) do
-      new_rest =
-        text
-        |> String.codepoints()
-        |> Enum.drop(String.length(remaining_char))
-        |> Enum.join()
-
-      lex(new_rest, [{:boolean, mode} | tokens])
-    end
-  end
-
-  defp scan_null(text, tokens) do
-    if String.starts_with?(text, "ull") do
-      new_rest =
-        text
-        |> String.codepoints()
-        |> Enum.drop(String.length("ull"))
-        |> Enum.join()
-
-      lex(new_rest, [:null | tokens])
-    end
   end
 
   defp scan_string(text) do
