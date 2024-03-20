@@ -10,7 +10,7 @@ defmodule ParserTest do
     assert {:error, :invalid_json} = Parser.parse([])
   end
 
-  test "should build AST for object containing various type values" do
+  test "should build AST for JSON with 1-level values" do
     tokens = [
       {:delimiter, :left_brace},
       {:string, "key1"},
@@ -32,8 +32,46 @@ defmodule ParserTest do
       {:string, "key5"},
       {:delimiter, :colon},
       {:number, 101},
-      {:delimiter, :comma},
-      {:string, "key6"},
+      {:delimiter, :right_brace}
+    ]
+
+    assert {:ok,
+            %{
+              object: %{
+                "key1" => true,
+                "key2" => false,
+                "key3" => nil,
+                "key4" => "value",
+                "key5" => 101
+              }
+            }} = Parser.parse(tokens)
+  end
+
+  test "should build AST for JSON with nested objects" do
+    tokens = [
+      {:delimiter, :left_brace},
+      {:string, "key1"},
+      {:delimiter, :colon},
+      {:delimiter, :left_brace},
+      {:string, "subkey1"},
+      {:delimiter, :colon},
+      {:boolean, true},
+      {:delimiter, :right_brace},
+      {:delimiter, :right_brace}
+    ]
+
+    assert {:ok,
+            %{
+              object: %{
+                "key1" => %{object: %{"subkey1" => true}}
+              }
+            }} = Parser.parse(tokens)
+  end
+
+  test "should build AST for JSON object containing complex array (with object inside)" do
+    tokens = [
+      {:delimiter, :left_brace},
+      {:string, "key1"},
       {:delimiter, :colon},
       {:delimiter, :left_bracket},
       {:number, 42},
@@ -52,12 +90,7 @@ defmodule ParserTest do
     assert {:ok,
             %{
               object: %{
-                "key1" => true,
-                "key2" => false,
-                "key3" => nil,
-                "key4" => "value",
-                "key5" => 101,
-                "key6" => %{array: [42, "forty-two", %{object: %{"subkey1" => true}}]}
+                "key1" => %{array: [42, "forty-two", %{object: %{"subkey1" => true}}]}
               }
             }} = Parser.parse(tokens)
   end
